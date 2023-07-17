@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Text,
   View,
-  ScrollView,
   TouchableWithoutFeedback,
   ImageBackground,
   TextInput,
@@ -10,7 +9,9 @@ import {
   Alert,
   Keyboard,
   StyleSheet,
+  KeyboardAvoidingView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const initialState = {
   email: '',
@@ -22,6 +23,8 @@ const LoginScreen = () => {
   const [focusEmail, setFocusEmail] = useState(false);
   const [focusPassword, setFocusPassword] = useState(false);
   const [hidingPassword, setHidingPassword] = useState(true);
+  const [hidingKeyboard, setHidingKeyboard] = useState(true);
+  const navigation = useNavigation();
 
   const validateEmail = email => {
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
@@ -41,18 +44,25 @@ const LoginScreen = () => {
       return;
     }
 
-    console.log(state);
+    console.log(state); // State is sent to the backend
     setState(initialState);
     Keyboard.dismiss();
+    setHidingKeyboard(true);
+    navigation.navigate('Home');
+  };
+
+  const onHideKeyboard = () => {
+    Keyboard.dismiss();
+    setHidingKeyboard(true);
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback onPress={onHideKeyboard}>
       <View style={styles.container}>
-        <ImageBackground style={styles.background} source={require('../images/background.jpg')}>
-          <ScrollView>
+        <ImageBackground style={styles.background} source={require('../../images/background.jpg')}>
+          <KeyboardAvoidingView behavior={'padding'} keyboardVerticalOffset={-300}>
             {/*----------- FORM------------- */}
-            <View style={styles.form}>
+            <View style={{ ...styles.form, paddingBottom: hidingKeyboard ? 100 : 10 }}>
               {/* ------------TITLE--------------- */}
               <Text style={styles.title}>Увійти</Text>
               {/* ----------INPUTS---------------- */}
@@ -63,8 +73,14 @@ const LoginScreen = () => {
                   marginBottom: 15,
                   borderColor: focusEmail ? '#FF6C00' : '#E8E8E8',
                 }}
-                onFocus={() => setFocusEmail(true)}
-                onBlur={() => setFocusEmail(false)}
+                onFocus={() => {
+                  setFocusEmail(true);
+                  setHidingKeyboard(false);
+                }}
+                onBlur={() => {
+                  setFocusEmail(false);
+                  setHidingKeyboard(true);
+                }}
                 value={state.email}
                 placeholder="Адреса електронної пошти"
                 cursorColor={'#BDBDBD'}
@@ -77,8 +93,14 @@ const LoginScreen = () => {
                     ...styles.input,
                     borderColor: focusPassword ? '#FF6C00' : '#E8E8E8',
                   }}
-                  onFocus={() => setFocusPassword(true)}
-                  onBlur={() => setFocusPassword(false)}
+                  onFocus={() => {
+                    setFocusPassword(true);
+                    setHidingKeyboard(false);
+                  }}
+                  onBlur={() => {
+                    setFocusPassword(false);
+                    setHidingKeyboard(true);
+                  }}
                   value={state.password}
                   placeholder="Пароль"
                   cursorColor={'#BDBDBD'}
@@ -103,11 +125,13 @@ const LoginScreen = () => {
               <TouchableOpacity activeOpacity={0.7}>
                 <Text style={styles.text}>
                   <Text>Немає акаунту? </Text>
-                  <Text style={styles.textLink}>Зареєструватися</Text>
+                  <Text style={styles.textLink} onPress={() => navigation.navigate('Registration')}>
+                    Зареєструватися
+                  </Text>
                 </Text>
               </TouchableOpacity>
             </View>
-          </ScrollView>
+          </KeyboardAvoidingView>
         </ImageBackground>
       </View>
     </TouchableWithoutFeedback>
@@ -132,8 +156,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    marginTop: '65%',
-    paddingBottom: 300,
   },
 
   title: {
