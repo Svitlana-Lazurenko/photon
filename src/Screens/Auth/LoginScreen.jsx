@@ -111,7 +111,6 @@ const LoginScreen = () => {
                 <TouchableOpacity
                   style={styles.inputButton}
                   onPress={() => setHidingPassword(prevState => !prevState)}
-                  activeOpacity={0.7}
                 >
                   <Text style={styles.inputButtonText}>
                     {hidingPassword ? 'Показати' : 'Приховати'}
@@ -122,7 +121,7 @@ const LoginScreen = () => {
               <TouchableOpacity style={styles.formButton} onPress={onLogin} activeOpacity={0.7}>
                 <Text style={styles.formButtonText}>Увійти</Text>
               </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity>
                 <Text style={styles.text}>
                   <Text>Немає акаунту? </Text>
                   <Text style={styles.textLink} onPress={() => navigation.navigate('Registration')}>
@@ -143,7 +142,7 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
 
   background: {
@@ -153,7 +152,7 @@ const styles = StyleSheet.create({
   },
 
   form: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },

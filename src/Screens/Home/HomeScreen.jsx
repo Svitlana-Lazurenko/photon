@@ -65,25 +65,14 @@ function HomeScreen() {
           route.name === 'CreatePosts'
             ? { display: 'none' }
             : { height: 83, paddingHorizontal: 50 },
-        headerRightContainerStyle: { paddingRight: 15 },
-        headerLeftContainerStyle: { paddingLeft: 15 },
+        headerLeftContainerStyle: route.name === 'CreatePosts' ? { paddingLeft: 15 } : {},
       })}
     >
       <Tab.Screen
         name="Posts"
         component={PostsScreen}
         options={{
-          title: 'Публікації',
-          headerTitleStyle: {
-            fontWeight: 500,
-            fontSize: 17,
-            lineHeight: 22,
-          },
-          headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <IconIonicons name={'ios-exit-outline'} size={30} color={'#212121'} />
-            </TouchableOpacity>
-          ),
+          headerShown: false,
         }}
       />
       <Tab.Screen
