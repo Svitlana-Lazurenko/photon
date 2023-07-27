@@ -10,6 +10,7 @@ import {
   Keyboard,
   StyleSheet,
   KeyboardAvoidingView,
+  Image,
 } from 'react-native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +19,7 @@ const initialState = {
   email: '',
   password: '',
   login: '',
+  avatar: null,
 };
 
 const RegistrationScreen = () => {
@@ -29,18 +31,23 @@ const RegistrationScreen = () => {
   const [hidingKeyboard, setHidingKeyboard] = useState(true);
   const navigation = useNavigation();
 
+  const onSetAvatar = () => {
+    //  Calls the media-library and sets the avatar in state
+  };
+
   const validateEmail = email => {
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     return reg.test(email);
   };
 
-  const onLogin = () => {
+  const onRegistration = () => {
     const email = state.email;
     const password = state.password;
     const login = state.login;
+    const avatar = state.avatar;
 
-    if (!email.trim() || !password.trim() || !login.trim()) {
-      Alert.alert('Усі поля повинні бути заповнені !');
+    if (!email.trim() || !password.trim() || !login.trim() || !avatar) {
+      Alert.alert('Всі поля та фото профілю повинні бути заповнені !');
       return;
     }
     if (!validateEmail(email)) {
@@ -68,9 +75,20 @@ const RegistrationScreen = () => {
             {/*----------- FORM------------- */}
             <View style={{ ...styles.form, paddingBottom: hidingKeyboard ? 100 : 10 }}>
               {/* -----------------AVATAR----------------- */}
-              <View style={styles.avatar}>
-                <TouchableOpacity style={styles.avatarButton} activeOpacity={0.7}>
-                  <IconIonicons name="add" size={20} color="#FF6C00" />
+              <View style={styles.avatarWrapper}>
+                <Image source={state.avatar} style={styles.avatar} />
+                <TouchableOpacity
+                  style={{
+                    ...styles.avatarButton,
+                    borderColor: state.avatar ? '#BDBDBD' : '#FF6C00',
+                  }}
+                  onPress={onSetAvatar}
+                >
+                  {state.avatar ? (
+                    <IconIonicons name="close-outline" size={20} color="#BDBDBD" />
+                  ) : (
+                    <IconIonicons name="add" size={20} color="#FF6C00" />
+                  )}
                 </TouchableOpacity>
               </View>
               {/* ------------TITLE--------------- */}
@@ -142,7 +160,6 @@ const RegistrationScreen = () => {
                 <TouchableOpacity
                   style={styles.inputButton}
                   onPress={() => setHidingPassword(prevState => !prevState)}
-                  activeOpacity={0.7}
                 >
                   <Text style={styles.inputButtonText}>
                     {hidingPassword ? 'Показати' : 'Приховати'}
@@ -150,10 +167,14 @@ const RegistrationScreen = () => {
                 </TouchableOpacity>
               </View>
               {/* ----------------BUTTONS---------------- */}
-              <TouchableOpacity style={styles.formButton} onPress={onLogin} activeOpacity={0.7}>
+              <TouchableOpacity
+                style={styles.formButton}
+                onPress={onRegistration}
+                activeOpacity={0.7}
+              >
                 <Text style={styles.formButtonText}>Увійти</Text>
               </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity>
                 <Text style={styles.text}>
                   <Text>Вже є акаунт? </Text>
                   <Text style={styles.textLink} onPress={() => navigation.navigate('Login')}>
@@ -174,7 +195,7 @@ export default RegistrationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
 
   background: {
@@ -184,15 +205,20 @@ const styles = StyleSheet.create({
   },
 
   form: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
 
-  avatar: {
+  avatarWrapper: {
     position: 'absolute',
     top: '-15%',
     right: '35%',
+    width: 120,
+    height: 120,
+  },
+
+  avatar: {
     width: 120,
     height: 120,
     borderRadius: 15,
@@ -207,7 +233,6 @@ const styles = StyleSheet.create({
     height: 25,
     borderRadius: 50,
     borderWidth: 1,
-    borderColor: '#FF6C00',
     justifyContent: 'center',
     alignItems: 'center',
   },
