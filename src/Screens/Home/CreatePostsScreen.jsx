@@ -67,8 +67,7 @@ const CreatePostsScreen = () => {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
-      console.log(coords);
-      navigation.navigate('Default', { image, title, locality, comments: [], geoLocation: coords });
+      navigation.navigate('Posts', { image, title, locality, comments: [], geoLocation: coords });
       cleanData();
     } catch (error) {
       Alert.alert(error.message);
