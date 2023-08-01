@@ -7,6 +7,8 @@ import IconIonicons from 'react-native-vector-icons/Ionicons';
 import PostsScreen from './PostsScreen';
 import CreatePostsScreen from './CreatePostsScreen';
 import ProfileScreen from './ProfileScreen';
+import CommentsScreen from './CommentsScreen';
+import MapScreen from './MapScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -59,32 +61,36 @@ function HomeScreen() {
             );
           }
         },
-        headerTitleAlign: 'center',
         tabBarShowLabel: false,
-        tabBarStyle:
-          route.name === 'CreatePosts'
-            ? { display: 'none' }
-            : { height: 83, paddingHorizontal: 50 },
-        headerLeftContainerStyle: route.name === 'CreatePosts' ? { paddingLeft: 15 } : {},
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 500,
+          fontSize: 17,
+          lineHeight: 22,
+        },
       })}
     >
       <Tab.Screen
         name="Posts"
         component={PostsScreen}
         options={{
-          headerShown: false,
+          tabBarStyle: { height: 83, paddingHorizontal: 50 },
+          title: 'Публікації',
+          headerRightContainerStyle: { paddingRight: 15 },
+          headerRight: () => (
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <IconIonicons name={'ios-exit-outline'} size={30} color={'#BDBDBD'} />
+            </TouchableOpacity>
+          ),
         }}
       />
       <Tab.Screen
         name="CreatePosts"
         component={CreatePostsScreen}
         options={{
+          tabBarStyle: { display: 'none' },
           title: 'Створити публікацію',
-          headerTitleStyle: {
-            fontWeight: 500,
-            fontSize: 17,
-            lineHeight: 22,
-          },
+          headerLeftContainerStyle: { paddingLeft: 15 },
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.navigate('Posts')}>
               <IconIonicons name={'arrow-back-outline'} size={30} color={'#212121'} />
@@ -92,7 +98,41 @@ function HomeScreen() {
           ),
         }}
       />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ tabBarStyle: { height: 83, paddingHorizontal: 50 }, headerShown: false }}
+      />
+      <Tab.Screen
+        name="Comments"
+        component={CommentsScreen}
+        options={{
+          title: 'Коментарі',
+          headerLeftContainerStyle: { paddingLeft: 15 },
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.navigate('Posts')}>
+              <IconIonicons name={'arrow-back-outline'} size={30} color={'#212121'} />
+            </TouchableOpacity>
+          ),
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+      <Tab.Screen
+        name="Map"
+        component={MapScreen}
+        options={{
+          title: 'Мапа',
+          headerLeftContainerStyle: { paddingLeft: 15 },
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.navigate('Posts')}>
+              <IconIonicons name={'arrow-back-outline'} size={30} color={'#212121'} />
+            </TouchableOpacity>
+          ),
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
     </Tab.Navigator>
   );
 }
