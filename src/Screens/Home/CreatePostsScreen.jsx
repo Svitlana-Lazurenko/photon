@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TouchableWithoutFeedback,
   Keyboard,
@@ -15,6 +15,8 @@ import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../../firebase/config';
 
 const CreatePostsScreen = () => {
   const [cameraRef, setCameraRef] = useState(null);
@@ -60,6 +62,27 @@ const CreatePostsScreen = () => {
     }
   };
 
+  const uploadPhotoToserver = async () => {
+    const response = await fetch(image);
+    const file = await response.blob();
+    const postId = Date.now().toString();
+    const imagesRef = ref(storage, `images/${postId}`);
+    await uploadBytes(imagesRef, file).then(snapshot => {
+      console.log('Uploaded a blob !');
+    });
+
+    await getDownloadURL(imagesRef)
+      .then(url => {
+        console.log(url);
+        // Or inserted into an <img> element
+        // const img = document.getElementById('myimg');
+        // img.setAttribute('src', url);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   const sendPhoto = async () => {
     try {
       const location = await Location.getCurrentPositionAsync({});
@@ -67,6 +90,7 @@ const CreatePostsScreen = () => {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
+      uploadPhotoToserver();
       navigation.navigate('Posts', { image, title, locality, comments: [], geoLocation: coords });
       cleanData();
     } catch (error) {
