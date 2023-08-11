@@ -3,17 +3,22 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
-
+import { useDispatch } from 'react-redux';
 import PostsScreen from './PostsScreen';
 import CreatePostsScreen from './CreatePostsScreen';
 import ProfileScreen from './ProfileScreen';
 import CommentsScreen from './CommentsScreen';
 import MapScreen from './MapScreen';
+import { authSignOutUser } from '../../../redux/auth/authOperations';
 
 const Tab = createBottomTabNavigator();
 
 function HomeScreen() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const signOut = () => {
+    dispatch(authSignOutUser());
+  };
 
   return (
     <Tab.Navigator
@@ -78,7 +83,7 @@ function HomeScreen() {
           title: 'Публікації',
           headerRightContainerStyle: { paddingRight: 15 },
           headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity onPress={signOut}>
               <IconIonicons name={'ios-exit-outline'} size={30} color={'#BDBDBD'} />
             </TouchableOpacity>
           ),

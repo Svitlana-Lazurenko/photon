@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   Text,
   View,
@@ -12,6 +13,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { authSignInUser } from '../../../redux/auth/authOperations';
 
 const initialState = {
   email: '',
@@ -25,6 +27,7 @@ const LoginScreen = () => {
   const [hidingPassword, setHidingPassword] = useState(true);
   const [hidingKeyboard, setHidingKeyboard] = useState(true);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const validateEmail = email => {
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
@@ -44,11 +47,11 @@ const LoginScreen = () => {
       return;
     }
 
-    console.log(state); // State is sent to the backend
+    console.log(state);
+    dispatch(authSignInUser(state));
     setState(initialState);
     Keyboard.dismiss();
     setHidingKeyboard(true);
-    navigation.navigate('Home');
   };
 
   const onHideKeyboard = () => {
