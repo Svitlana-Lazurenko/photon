@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   Text,
   View,
@@ -14,6 +15,7 @@ import {
 } from 'react-native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import { authSignUpUser } from '../../../redux/auth/authOperations';
 
 const initialState = {
   email: '',
@@ -30,6 +32,7 @@ const RegistrationScreen = () => {
   const [hidingPassword, setHidingPassword] = useState(true);
   const [hidingKeyboard, setHidingKeyboard] = useState(true);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const onSetAvatar = () => {
     //  Calls the media-library and sets the avatar in state
@@ -46,7 +49,12 @@ const RegistrationScreen = () => {
     const login = state.login;
     const avatar = state.avatar;
 
-    if (!email.trim() || !password.trim() || !login.trim() || !avatar) {
+    if (
+      !email.trim() ||
+      !password.trim() ||
+      !login.trim()
+      // || !avatar
+    ) {
       Alert.alert('Всі поля та фото профілю повинні бути заповнені !');
       return;
     }
@@ -55,11 +63,11 @@ const RegistrationScreen = () => {
       return;
     }
 
-    console.log(state); // State is sent to the backend
+    console.log(state);
+    dispatch(authSignUpUser(state));
     setState(initialState);
     Keyboard.dismiss();
     setHidingKeyboard(true);
-    navigation.navigate('Home');
   };
 
   const onHideKeyboard = () => {
