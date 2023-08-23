@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Text,
   View,
@@ -11,29 +12,62 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  // SafeAreaView,
 } from 'react-native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
+import { collection, addDoc, serverTimestamp, query, onSnapshot } from 'firebase/firestore';
+import { db } from '../../../firebase/config';
 
 const CommentsScreen = ({ route }) => {
-  const sendComment = () => {
-    // send comment
+  const [comment, setComment] = useState('');
+  const [allComments, setAllComments] = useState([]);
+  const { photo } = route.params.item;
+  const { login } = useSelector(state => state.auth);
+
+  const createComment = async () => {
+    const postsRef = collection(db, 'posts');
+    const data = { comment, login, timestamp: serverTimestamp() };
+    await addDoc(collection(postsRef, photo, 'comments'), data);
+    // setComment('');
   };
+
+  const getAllComments = async () => {
+    const postsRef = collection(db, 'posts/' + photo + '/collections');
+    const q = query(postsRef);
+    const commentsArr = [];
+    onSnapshot(q, querySnapshot => {
+      querySnapshot.forEach(doc => {
+        commentsArr.push(doc.data());
+      });
+    });
+    setAllComments(commentsArr);
+  };
+
+  useEffect(() => {
+    getAllComments();
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <Image style={styles.image} source={route.params.photo} />
+        {/* <SafeAreaView style={styles.innerContainer}> */}
+
         <FlatList
-          data={route.params.comments}
+          style={styles.list}
+          data={allComments}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => {
             return (
-              <View>
-                <Text>{item}</Text>
+              <View style={styles.commentContainer}>
+                <Text style={styles.comment}>{item.login}</Text>
+                <Text style={styles.comment}>{item.comment}</Text>
+                <Text style={styles.comment}>{item.timestamp}</Text>
               </View>
             );
           }}
         ></FlatList>
+        {/* </SafeAreaView> */}
         <KeyboardAvoidingView
           behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
           style={styles.inputWrapper}
@@ -43,8 +77,9 @@ const CommentsScreen = ({ route }) => {
             placeholder="Коментувати..."
             cursorColor={'#BDBDBD'}
             placeholderTextColor={'#BDBDBD'}
+            onChangeText={comment => setComment(comment)}
           ></TextInput>
-          <TouchableOpacity style={styles.button} onPress={sendComment} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.button} onPress={createComment} activeOpacity={0.7}>
             <IconIonicons name="arrow-up" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </KeyboardAvoidingView>
@@ -67,9 +102,19 @@ const styles = StyleSheet.create({
   image: {
     height: 250,
     width: 350,
-    backgroundColor: '#212121',
+    backgroundColor: '#000000',
     borderRadius: 8,
   },
+
+  innerContainer: {
+    height: 370,
+  },
+
+  list: {},
+
+  commentContainer: {},
+
+  comment: {},
 
   inputWrapper: {
     position: 'relative',

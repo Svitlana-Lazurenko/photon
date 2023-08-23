@@ -2,9 +2,7 @@ import React from 'react';
 import 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 import { Provider } from 'react-redux';
-
 import store from './redux/store';
-
 import Main from './components/Main';
 
 export default function App() {

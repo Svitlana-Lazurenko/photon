@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
   },
 
   form: {
+    position: 'relative',
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
 
   avatarWrapper: {
     position: 'absolute',
-    top: '-15%',
+    top: '-50%',
     right: '35%',
     width: 120,
     height: 120,
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
 
   avatarButton: {
     position: 'absolute',
-    top: '60%',
+    top: '65%',
     right: '-10%',
     width: 25,
     height: 25,

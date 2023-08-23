@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import {
   TouchableWithoutFeedback,
   Keyboard,
@@ -16,17 +17,19 @@ import * as Location from 'expo-location';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../../firebase/config';
+import { doc, setDoc } from 'firebase/firestore';
+import { storage, db } from '../../../firebase/config';
 
 const CreatePostsScreen = () => {
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState('');
-  const [locality, setLocality] = useState('');
+  const [place, setPlace] = useState('');
   const [hasPermissionCamera, setHasPermissionCamera] = useState(null);
   const [hasPermissionGeolocation, setHasPermissionGeolocation] = useState(null);
   const navigation = useNavigation();
+  const { userId, login } = useSelector(state => state.auth);
 
   useEffect(() => {
     (async () => {
@@ -44,9 +47,10 @@ const CreatePostsScreen = () => {
   };
 
   const cleanData = () => {
+    setType(Camera.Constants.Type.back);
     setImage(null);
     setTitle('');
-    setLocality('');
+    setPlace('');
   };
 
   const cleanPhoto = () => {
@@ -65,37 +69,43 @@ const CreatePostsScreen = () => {
   const uploadPhotoToserver = async () => {
     const response = await fetch(image);
     const file = await response.blob();
-    const postId = Date.now().toString();
-    const imagesRef = ref(storage, `images/${postId}`);
-    await uploadBytes(imagesRef, file).then(snapshot => {
-      console.log('Uploaded a blob !');
+    const imageId = Date.now().toString();
+    const imagesRef = ref(storage, `images/${imageId}`);
+    await uploadBytes(imagesRef, file);
+    await getDownloadURL(imagesRef).catch(error => {
+      Alert.alert(error.message);
     });
-
-    await getDownloadURL(imagesRef)
-      .then(url => {
-        console.log(url);
-        // Or inserted into an <img> element
-        // const img = document.getElementById('myimg');
-        // img.setAttribute('src', url);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    return imageId;
   };
 
-  const sendPhoto = async () => {
+  const uploadPostToServer = async () => {
     try {
+      const postId = await uploadPhotoToserver();
       const location = await Location.getCurrentPositionAsync({});
+
       const coords = {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
-      uploadPhotoToserver();
-      navigation.navigate('Posts', { image, title, locality, comments: [], geoLocation: coords });
-      cleanData();
+      const data = {
+        userId,
+        login,
+        photo: postId,
+        title,
+        place,
+        geoLocation: coords,
+      };
+      console.log('test', data);
+      await setDoc(doc(db, 'posts', postId), data);
     } catch (error) {
       Alert.alert(error.message);
     }
+  };
+
+  const sendPhoto = async () => {
+    uploadPostToServer();
+    navigation.navigate('Posts');
+    cleanData();
   };
 
   if (hasPermissionCamera === null || hasPermissionGeolocation === null) {
@@ -138,11 +148,11 @@ const CreatePostsScreen = () => {
           <View style={styles.iputWrapper}>
             <TextInput
               style={{ ...styles.input, paddingLeft: 35 }}
-              value={locality}
+              value={place}
               placeholder="Місцевість..."
               cursorColor={'#BDBDBD'}
               placeholderTextColor={'#BDBDBD'}
-              onChangeText={locality => setLocality(locality)}
+              onChangeText={place => setPlace(place)}
             ></TextInput>
             <IconIonicons
               name="location-outline"

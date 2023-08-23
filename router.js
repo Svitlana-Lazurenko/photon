@@ -1,5 +1,4 @@
 import { createStackNavigator } from '@react-navigation/stack';
-
 import LoginScreen from './src/Screens/Auth/LoginScreen';
 import RegistrationScreen from './src/Screens/Auth/RegistrationScreen';
 import HomeScreen from './src/Screens/Home/HomeScreen';
