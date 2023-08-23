@@ -1,17 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, FlatList, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { db } from '../../../firebase/config';
 
 const PostsScreen = ({ route }) => {
   const [posts, setPosts] = useState([]);
   const navigation = useNavigation();
+  const { login } = useSelector(state => state.auth);
+
+  const getAllPost = async () => {
+    const postsRef = collection(db, 'posts');
+    const q = query(postsRef);
+    const postsArr = [];
+    onSnapshot(q, querySnapshot => {
+      querySnapshot.forEach(doc => {
+        postsArr.push(doc.data());
+      });
+    });
+    setPosts(postsArr);
+  };
 
   useEffect(() => {
-    if (route.params !== undefined) {
-      setPosts(prevState => [...prevState, route.params]);
-    }
-  }, [route.params]);
+    getAllPost();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -21,11 +43,11 @@ const PostsScreen = ({ route }) => {
           // source={''}
         />
         <View style={styles.textWrapper}>
-          <Text style={styles.name}>Natali Romanova</Text>
-          <Text style={styles.email}>email@example.com</Text>
+          <Text style={styles.name}>{login}</Text>
+          {/* <Text style={styles.email}>{email}</Text> */}
         </View>
       </View>
-      <View style={styles.innerContainer}>
+      <SafeAreaView style={styles.innerContainer}>
         <FlatList
           style={styles.list}
           data={posts}
@@ -33,33 +55,33 @@ const PostsScreen = ({ route }) => {
           renderItem={({ item }) => {
             const photo = item.photo;
             const location = item.geoLocation;
-            const comments = item.comments;
-            const numberComments = comments.length;
+            // const comments = item.comments;
+            // const numberComments = comments.length;
             return (
               <View style={styles.photoContainer}>
-                <Image style={styles.image} source={photo} />
+                <Image style={styles.image} source={Number(photo)} />
                 <Text style={styles.title}>{item.title}</Text>
                 <View style={styles.buttonsContainer}>
                   <TouchableOpacity
                     style={styles.commentsButton}
-                    onPress={() => navigation.navigate('Comments', { photo, comments })}
+                    onPress={() => navigation.navigate('Comments', { item })}
                   >
                     <IconIonicons name="chatbubble-outline" size={24} color="#BDBDBD" />
-                    <Text style={styles.commentsButtonText}>{numberComments}</Text>
+                    {/* <Text style={styles.commentsButtonText}>{numberComments}</Text>  */}
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.mapButton}
                     onPress={() => navigation.navigate('Map', location)}
                   >
                     <IconIonicons name="location-outline" size={24} color="#BDBDBD" />
-                    <Text style={styles.mapButtonText}>{item.locality}</Text>
+                    <Text style={styles.mapButtonText}>{item.place}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             );
           }}
         ></FlatList>
-      </View>
+      </SafeAreaView>
     </View>
   );
 };
