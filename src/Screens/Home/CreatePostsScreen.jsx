@@ -95,7 +95,7 @@ const CreatePostsScreen = () => {
         place,
         geoLocation: coords,
       };
-      console.log('test', data);
+
       await setDoc(doc(db, 'posts', postId), data);
     } catch (error) {
       Alert.alert(error.message);

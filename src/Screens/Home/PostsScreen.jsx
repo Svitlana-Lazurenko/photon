@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
@@ -18,6 +18,7 @@ const PostsScreen = ({ route }) => {
   const [posts, setPosts] = useState([]);
   const navigation = useNavigation();
   const { login } = useSelector(state => state.auth);
+  const isFocused = useIsFocused();
 
   const getAllPost = async () => {
     const postsRef = collection(db, 'posts');
@@ -48,39 +49,41 @@ const PostsScreen = ({ route }) => {
         </View>
       </View>
       <SafeAreaView style={styles.innerContainer}>
-        <FlatList
-          style={styles.list}
-          data={posts}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => {
-            const photo = item.photo;
-            const location = item.geoLocation;
-            // const comments = item.comments;
-            // const numberComments = comments.length;
-            return (
-              <View style={styles.photoContainer}>
-                <Image style={styles.image} source={Number(photo)} />
-                <Text style={styles.title}>{item.title}</Text>
-                <View style={styles.buttonsContainer}>
-                  <TouchableOpacity
-                    style={styles.commentsButton}
-                    onPress={() => navigation.navigate('Comments', { item })}
-                  >
-                    <IconIonicons name="chatbubble-outline" size={24} color="#BDBDBD" />
-                    {/* <Text style={styles.commentsButtonText}>{numberComments}</Text>  */}
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.mapButton}
-                    onPress={() => navigation.navigate('Map', location)}
-                  >
-                    <IconIonicons name="location-outline" size={24} color="#BDBDBD" />
-                    <Text style={styles.mapButtonText}>{item.place}</Text>
-                  </TouchableOpacity>
+        {isFocused ? (
+          <FlatList
+            style={styles.list}
+            data={posts}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => {
+              const photo = item.photo;
+              const location = item.geoLocation;
+              // const comments = item.comments;
+              // const numberComments = comments.length;
+              return (
+                <View style={styles.photoContainer}>
+                  <Image style={styles.image} source={Number(photo)} />
+                  <Text style={styles.title}>{item.title}</Text>
+                  <View style={styles.buttonsContainer}>
+                    <TouchableOpacity
+                      style={styles.commentsButton}
+                      onPress={() => navigation.navigate('Comments', { item })}
+                    >
+                      <IconIonicons name="chatbubble-outline" size={24} color="#BDBDBD" />
+                      {/* <Text style={styles.commentsButtonText}>{numberComments}</Text>  */}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.mapButton}
+                      onPress={() => navigation.navigate('Map', location)}
+                    >
+                      <IconIonicons name="location-outline" size={24} color="#BDBDBD" />
+                      <Text style={styles.mapButtonText}>{item.place}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            );
-          }}
-        ></FlatList>
+              );
+            }}
+          ></FlatList>
+        ) : null}
       </SafeAreaView>
     </View>
   );
