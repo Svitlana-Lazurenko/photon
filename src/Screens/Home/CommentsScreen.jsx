@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import { collection, addDoc, serverTimestamp, query, onSnapshot } from 'firebase/firestore';
+import { useIsFocused } from '@react-navigation/native';
 import { db } from '../../../firebase/config';
 
 const CommentsScreen = ({ route }) => {
@@ -23,6 +24,8 @@ const CommentsScreen = ({ route }) => {
   const [allComments, setAllComments] = useState([]);
   const { photo } = route.params.item;
   const { login } = useSelector(state => state.auth);
+
+  const isFocused = useIsFocused();
 
   const createComment = async () => {
     const postsRef = collection(db, 'posts');
@@ -52,21 +55,22 @@ const CommentsScreen = ({ route }) => {
       <View style={styles.container}>
         <Image style={styles.image} source={route.params.photo} />
         {/* <SafeAreaView style={styles.innerContainer}> */}
-
-        <FlatList
-          style={styles.list}
-          data={allComments}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => {
-            return (
-              <View style={styles.commentContainer}>
-                <Text style={styles.comment}>{item.login}</Text>
-                <Text style={styles.comment}>{item.comment}</Text>
-                <Text style={styles.comment}>{item.timestamp}</Text>
-              </View>
-            );
-          }}
-        ></FlatList>
+        {isFocused ? (
+          <FlatList
+            style={styles.list}
+            data={allComments}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => {
+              return (
+                <View style={styles.commentContainer}>
+                  <Text style={styles.comment}>{item.login}</Text>
+                  <Text style={styles.comment}>{item.comment}</Text>
+                  <Text style={styles.comment}>{item.timestamp}</Text>
+                </View>
+              );
+            }}
+          ></FlatList>
+        ) : null}
         {/* </SafeAreaView> */}
         <KeyboardAvoidingView
           behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
