@@ -57,8 +57,6 @@ const PostsScreen = ({ route }) => {
             renderItem={({ item }) => {
               const photo = item.photo;
               const location = item.geoLocation;
-              // const comments = item.comments;
-              // const numberComments = comments.length;
               return (
                 <View style={styles.photoContainer}>
                   <Image style={styles.image} source={Number(photo)} />
@@ -69,7 +67,7 @@ const PostsScreen = ({ route }) => {
                       onPress={() => navigation.navigate('Comments', { item })}
                     >
                       <IconIonicons name="chatbubble-outline" size={24} color="#BDBDBD" />
-                      {/* <Text style={styles.commentsButtonText}>{numberComments}</Text>  */}
+                      {/* <Text style={styles.commentsButtonText}>{numberComments}</Text> */}
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.mapButton}

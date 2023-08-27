@@ -47,7 +47,6 @@ const LoginScreen = () => {
       return;
     }
 
-    console.log(state);
     dispatch(authSignInUser(state));
     setState(initialState);
     Keyboard.dismiss();
