@@ -23,18 +23,21 @@ const PostsScreen = ({ route }) => {
   const getAllPost = async () => {
     const postsRef = collection(db, 'posts');
     const q = query(postsRef);
-    const postsArr = [];
     onSnapshot(q, querySnapshot => {
-      querySnapshot.forEach(doc => {
-        postsArr.push(doc.data());
-      });
+      setPosts(
+        querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+          // commentsNumber: ,
+        }))
+      );
     });
-    setPosts(postsArr);
   };
 
   useEffect(() => {
-    getAllPost();
-  }, []);
+    if (isFocused) {
+      getAllPost();
+    }
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>
@@ -49,39 +52,38 @@ const PostsScreen = ({ route }) => {
         </View>
       </View>
       <SafeAreaView style={styles.innerContainer}>
-        {isFocused ? (
-          <FlatList
-            style={styles.list}
-            data={posts}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => {
-              const photo = item.photo;
-              const location = item.geoLocation;
-              return (
-                <View style={styles.photoContainer}>
-                  <Image style={styles.image} source={Number(photo)} />
-                  <Text style={styles.title}>{item.title}</Text>
-                  <View style={styles.buttonsContainer}>
-                    <TouchableOpacity
-                      style={styles.commentsButton}
-                      onPress={() => navigation.navigate('Comments', { item })}
-                    >
-                      <IconIonicons name="chatbubble-outline" size={24} color="#BDBDBD" />
-                      {/* <Text style={styles.commentsButtonText}>{numberComments}</Text> */}
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.mapButton}
-                      onPress={() => navigation.navigate('Map', location)}
-                    >
-                      <IconIonicons name="location-outline" size={24} color="#BDBDBD" />
-                      <Text style={styles.mapButtonText}>{item.place}</Text>
-                    </TouchableOpacity>
-                  </View>
+        <FlatList
+          style={styles.list}
+          data={posts}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => {
+            const photo = item.photo;
+            const location = item.geoLocation;
+            // const number = item.commentsNumber;
+            return (
+              <View style={styles.photoContainer}>
+                <Image style={styles.image} source={Number(photo)} />
+                <Text style={styles.title}>{item.title}</Text>
+                <View style={styles.buttonsContainer}>
+                  <TouchableOpacity
+                    style={styles.commentsButton}
+                    onPress={() => navigation.navigate('Comments', { item })}
+                  >
+                    <IconIonicons name="chatbubble-outline" size={24} color="#BDBDBD" />
+                    {/* <Text style={styles.commentsButtonText}>{number}</Text> */}
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.mapButton}
+                    onPress={() => navigation.navigate('Map', location)}
+                  >
+                    <IconIonicons name="location-outline" size={24} color="#BDBDBD" />
+                    <Text style={styles.mapButtonText}>{item.place}</Text>
+                  </TouchableOpacity>
                 </View>
-              );
-            }}
-          ></FlatList>
-        ) : null}
+              </View>
+            );
+          }}
+        ></FlatList>
       </SafeAreaView>
     </View>
   );

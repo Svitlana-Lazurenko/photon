@@ -13,8 +13,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
-import { collection, addDoc, serverTimestamp, query, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, query, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
 
 const CommentsScreen = ({ route }) => {
@@ -22,6 +23,7 @@ const CommentsScreen = ({ route }) => {
   const [allComments, setAllComments] = useState([]);
   const { photo } = route.params.item;
   const { login } = useSelector(state => state.auth);
+  const isFocused = useIsFocused();
 
   const createDate = () => {
     const date = new Date();
@@ -47,19 +49,20 @@ const CommentsScreen = ({ route }) => {
   const getAllComments = async () => {
     const commentsRef = collection(db, 'posts/' + photo + '/comments');
     const q = query(commentsRef);
-    const commentsArr = [];
     onSnapshot(q, querySnapshot => {
-      querySnapshot.forEach(doc => {
-        commentsArr.push(doc.data());
-      });
+      setAllComments(
+        querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+        }))
+      );
     });
-
-    setAllComments(commentsArr);
   };
 
   useEffect(() => {
-    getAllComments();
-  }, []);
+    if (isFocused) {
+      getAllComments();
+    }
+  }, [isFocused]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
