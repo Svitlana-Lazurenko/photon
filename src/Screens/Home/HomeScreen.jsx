@@ -115,7 +115,7 @@ function HomeScreen() {
           title: 'Коментарі',
           headerLeftContainerStyle: { paddingLeft: 15 },
           headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('Posts')}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <IconIonicons name={'arrow-back-outline'} size={30} color={'#212121'} />
             </TouchableOpacity>
           ),
@@ -130,7 +130,7 @@ function HomeScreen() {
           title: 'Мапа',
           headerLeftContainerStyle: { paddingLeft: 15 },
           headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('Posts')}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <IconIonicons name={'arrow-back-outline'} size={30} color={'#212121'} />
             </TouchableOpacity>
           ),

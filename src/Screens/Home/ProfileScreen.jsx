@@ -10,7 +10,7 @@ import {
   Image,
   ImageBackground,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import { onSnapshot, query, where, collection } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
@@ -22,6 +22,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { userId, login } = useSelector(state => state.auth);
+  const isFocused = useIsFocused();
 
   const onSetAvatar = () => {
     //  Calls the media-library and sets the avatar in state
@@ -30,22 +31,24 @@ const ProfileScreen = () => {
   const getAllUserPost = async () => {
     const postsRef = collection(db, 'posts');
     const q = query(postsRef, where('userId', '==', userId));
-    const userPostsArr = [];
     onSnapshot(q, querySnapshot => {
-      querySnapshot.forEach(doc => {
-        userPostsArr.push(doc.data());
-      });
+      setUserPosts(
+        querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+        }))
+      );
     });
-    setUserPosts(userPostsArr);
   };
-
-  useEffect(() => {
-    getAllUserPost();
-  }, []);
 
   const signOut = () => {
     dispatch(authSignOutUser());
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      getAllUserPost();
+    }
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>
