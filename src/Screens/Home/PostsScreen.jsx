@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
+import { View, StyleSheet, Image, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import { collection, onSnapshot, query } from 'firebase/firestore';
@@ -21,16 +13,20 @@ const PostsScreen = ({ route }) => {
   const isFocused = useIsFocused();
 
   const getAllPost = async () => {
-    const postsRef = collection(db, 'posts');
-    const q = query(postsRef);
-    onSnapshot(q, querySnapshot => {
-      setPosts(
-        querySnapshot.docs.map(doc => ({
-          ...doc.data(),
-          // commentsNumber: ,
-        }))
-      );
-    });
+    try {
+      const postsRef = collection(db, 'posts');
+      const q = query(postsRef);
+      onSnapshot(q, querySnapshot => {
+        setPosts(
+          querySnapshot.docs.map(doc => ({
+            ...doc.data(),
+            // commentsNumber: ,
+          }))
+        );
+      });
+    } catch (error) {
+      Alert.alert(error.message);
+    }
   };
 
   useEffect(() => {
@@ -51,18 +47,16 @@ const PostsScreen = ({ route }) => {
           {/* <Text style={styles.email}>{email}</Text> */}
         </View>
       </View>
-      <SafeAreaView style={styles.innerContainer}>
+      <View style={styles.innerContainer}>
         <FlatList
           style={styles.list}
           data={posts}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => {
-            const photo = item.photo;
-            const location = item.geoLocation;
-            // const number = item.commentsNumber;
+            const coords = item.coords;
             return (
               <View style={styles.photoContainer}>
-                <Image style={styles.image} source={Number(photo)} />
+                <Image style={styles.image} source={Number(item.postId)} />
                 <Text style={styles.title}>{item.title}</Text>
                 <View style={styles.buttonsContainer}>
                   <TouchableOpacity
@@ -70,11 +64,11 @@ const PostsScreen = ({ route }) => {
                     onPress={() => navigation.navigate('Comments', { item })}
                   >
                     <IconIonicons name="chatbubble-outline" size={24} color="#BDBDBD" />
-                    {/* <Text style={styles.commentsButtonText}>{number}</Text> */}
+                    {/* <Text style={styles.commentsButtonText}>item.comments.length</Text> */}
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.mapButton}
-                    onPress={() => navigation.navigate('Map', location)}
+                    onPress={() => navigation.navigate('Map', coords)}
                   >
                     <IconIonicons name="location-outline" size={24} color="#BDBDBD" />
                     <Text style={styles.mapButtonText}>{item.place}</Text>
@@ -84,7 +78,7 @@ const PostsScreen = ({ route }) => {
             );
           }}
         ></FlatList>
-      </SafeAreaView>
+      </View>
     </View>
   );
 };
@@ -131,11 +125,8 @@ const styles = StyleSheet.create({
   },
 
   innerContainer: {
-    alignItems: 'center',
-  },
-
-  list: {
     marginBottom: 110,
+    alignItems: 'center',
   },
 
   photoContainer: {

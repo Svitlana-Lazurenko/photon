@@ -62,8 +62,6 @@ const RegistrationScreen = () => {
       Alert.alert(`${email} - некоректна адреса електронної пошти !`);
       return;
     }
-
-    console.log(state);
     dispatch(authSignUpUser(state));
     setState(initialState);
     Keyboard.dismiss();
@@ -221,7 +219,7 @@ const styles = StyleSheet.create({
 
   avatarWrapper: {
     position: 'absolute',
-    top: '-50%',
+    top: '-15%',
     right: '35%',
     width: 120,
     height: 120,

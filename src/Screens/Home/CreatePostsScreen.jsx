@@ -67,15 +67,17 @@ const CreatePostsScreen = () => {
   };
 
   const uploadPhotoToserver = async () => {
-    const response = await fetch(image);
-    const file = await response.blob();
-    const imageId = Date.now().toString();
-    const imagesRef = ref(storage, `images/${imageId}`);
-    await uploadBytes(imagesRef, file);
-    await getDownloadURL(imagesRef).catch(error => {
+    try {
+      const response = await fetch(image);
+      const file = await response.blob();
+      const imageId = Date.now().toString();
+      const imagesRef = ref(storage, `images/${imageId}`);
+      await uploadBytes(imagesRef, file);
+      await getDownloadURL(imagesRef);
+      return imageId;
+    } catch (error) {
       Alert.alert(error.message);
-    });
-    return imageId;
+    }
   };
 
   const uploadPostToServer = async () => {
@@ -90,10 +92,10 @@ const CreatePostsScreen = () => {
       const data = {
         userId,
         login,
-        photo: postId,
+        postId,
         title,
         place,
-        geoLocation: coords,
+        coords,
       };
 
       await setDoc(doc(db, 'posts', postId), data);

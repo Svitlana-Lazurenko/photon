@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -28,10 +29,8 @@ export const authSignUpUser =
           login: displayName,
         })
       );
-
-      console.log('user', displayName);
     } catch (error) {
-      console.log('error.message', error.message);
+      Alert.alert(error.message);
     }
   };
 
@@ -41,13 +40,17 @@ export const authSignInUser =
     try {
       const user = await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      console.log('error.message', error.message);
+      Alert.alert(error.message);
     }
   };
 
 export const authSignOutUser = () => async (dispatch, getState) => {
-  await signOut(auth);
-  dispatch(authSignOut());
+  try {
+    await signOut(auth);
+    dispatch(authSignOut());
+  } catch (error) {
+    Alert.alert(error.message);
+  }
 };
 
 export const authStateChangeUser = () => async (dispatch, getState) => {
