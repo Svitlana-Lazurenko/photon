@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "r-native",
-    "slug": "r-native",
+    "name": "photon",
+    "slug": "photon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
