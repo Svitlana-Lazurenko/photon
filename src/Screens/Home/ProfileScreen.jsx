@@ -5,10 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  SafeAreaView,
   FlatList,
   Image,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
@@ -29,15 +29,19 @@ const ProfileScreen = () => {
   };
 
   const getAllUserPost = async () => {
-    const postsRef = collection(db, 'posts');
-    const q = query(postsRef, where('userId', '==', userId));
-    onSnapshot(q, querySnapshot => {
-      setUserPosts(
-        querySnapshot.docs.map(doc => ({
-          ...doc.data(),
-        }))
-      );
-    });
+    try {
+      const postsRef = collection(db, 'posts');
+      const q = query(postsRef, where('userId', '==', userId));
+      onSnapshot(q, querySnapshot => {
+        setUserPosts(
+          querySnapshot.docs.map(doc => ({
+            ...doc.data(),
+          }))
+        );
+      });
+    } catch (error) {
+      Alert.alert(error.message);
+    }
   };
 
   const signOut = () => {
@@ -77,19 +81,16 @@ const ProfileScreen = () => {
             <IconIonicons name={'ios-exit-outline'} size={30} color={'#BDBDBD'} />
           </TouchableOpacity>
           <Text style={styles.login}>{login}</Text>
-          <SafeAreaView style={styles.innerContainer}>
+          <View style={styles.innerContainer}>
             <FlatList
               style={styles.list}
               data={userPosts}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => {
-                const photo = item.photo;
-                const location = item.geoLocation;
-                // const comments = item.comments;
-                // const numberComments = comments.length;
+                const coords = item.coords;
                 return (
                   <View style={styles.photoContainer}>
-                    <Image style={styles.image} source={Number(photo)} />
+                    <Image style={styles.image} source={Number(item.postId)} />
                     <Text style={styles.title}>{item.title}</Text>
                     <View style={styles.buttonsContainer}>
                       <TouchableOpacity
@@ -97,11 +98,11 @@ const ProfileScreen = () => {
                         onPress={() => navigation.navigate('Comments', { item })}
                       >
                         <IconIonicons name="chatbubble-outline" size={24} color="#BDBDBD" />
-                        {/* <Text style={styles.commentsButtonText}>{numberComments}</Text> */}
+                        {/* <Text style={styles.commentsButtonText}>item.comments.length</Text> */}
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.mapButton}
-                        onPress={() => navigation.navigate('Map', location)}
+                        onPress={() => navigation.navigate('Map', coords)}
                       >
                         <IconIonicons name="location-outline" size={24} color="#BDBDBD" />
                         <Text style={styles.mapButtonText}>{item.place}</Text>
@@ -111,7 +112,7 @@ const ProfileScreen = () => {
                 );
               }}
             ></FlatList>
-          </SafeAreaView>
+          </View>
         </View>
       </ImageBackground>
     </View>

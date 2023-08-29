@@ -12,6 +12,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
@@ -21,7 +22,7 @@ import { db } from '../../../firebase/config';
 const CommentsScreen = ({ route }) => {
   const [comment, setComment] = useState('');
   const [allComments, setAllComments] = useState([]);
-  const { photo } = route.params.item;
+  const { postId } = route.params.item;
   const { login } = useSelector(state => state.auth);
   const isFocused = useIsFocused();
 
@@ -34,28 +35,36 @@ const CommentsScreen = ({ route }) => {
   };
 
   const createComment = async () => {
-    const postsRef = collection(db, 'posts');
-    const data = {
-      comment,
-      login,
-      timestamp: createDate(),
-    };
+    try {
+      const postsRef = collection(db, 'posts');
+      const data = {
+        comment,
+        login,
+        timestamp: createDate(),
+      };
 
-    await addDoc(collection(postsRef, photo, 'comments'), data);
-    setComment('');
-    Keyboard.dismiss();
+      await addDoc(collection(postsRef, postId, 'comments'), data);
+      setComment('');
+      Keyboard.dismiss();
+    } catch (error) {
+      Alert.alert(error.message);
+    }
   };
 
   const getAllComments = async () => {
-    const commentsRef = collection(db, 'posts/' + photo + '/comments');
-    const q = query(commentsRef);
-    onSnapshot(q, querySnapshot => {
-      setAllComments(
-        querySnapshot.docs.map(doc => ({
-          ...doc.data(),
-        }))
-      );
-    });
+    try {
+      const commentsRef = collection(db, 'posts/' + postId + '/comments');
+      const q = query(commentsRef);
+      onSnapshot(q, querySnapshot => {
+        setAllComments(
+          querySnapshot.docs.map(doc => ({
+            ...doc.data(),
+          }))
+        );
+      });
+    } catch (error) {
+      Alert.alert(error.message);
+    }
   };
 
   useEffect(() => {
@@ -67,8 +76,7 @@ const CommentsScreen = ({ route }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Image style={styles.image} source={route.params.photo} />
-
+        <Image style={styles.image} source={route.params.postId} />
         <FlatList
           style={styles.list}
           data={allComments}
@@ -83,7 +91,6 @@ const CommentsScreen = ({ route }) => {
             );
           }}
         ></FlatList>
-
         <KeyboardAvoidingView
           behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
           style={styles.inputWrapper}

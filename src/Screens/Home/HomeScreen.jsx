@@ -13,9 +13,10 @@ import { authSignOutUser } from '../../../redux/auth/authOperations';
 
 const Tab = createBottomTabNavigator();
 
-function HomeScreen() {
+const HomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
   const signOut = () => {
     dispatch(authSignOutUser());
   };
@@ -140,6 +141,6 @@ function HomeScreen() {
       />
     </Tab.Navigator>
   );
-}
+};
 
 export default HomeScreen;

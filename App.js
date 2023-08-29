@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 import Main from './components/Main';
 
-export default function App() {
+const App = () => {
   const [fontsLoaded] = useFonts({
     'Roboto-Bold': require('./src/fonts/Roboto-Bold.ttf'),
     'Roboto-Medium': require('./src/fonts/Roboto-Medium.ttf'),
@@ -21,4 +21,6 @@ export default function App() {
       <Main />
     </Provider>
   );
-}
+};
+
+export default App;
